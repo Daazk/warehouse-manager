@@ -1,0 +1,40 @@
+# ====== PYTHON ======
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*$py.class
+
+# ====== ВИРТУАЛЬНОЕ ОКРУЖЕНИЕ ======
+venv/
+.env/
+.venv/
+env/
+ENV/
+pip-wheel-metadata/
+
+# ====== IDE И РЕДАКТОРЫ ======
+.vscode/
+.idea/
+*.sublime-project
+*.sublime-workspace
+
+# ====== ВРЕМЕННЫЕ И ЛОГИ ======
+*.log
+*.tmp
+*.bak
+*.swp
+*.DS_Store
+Thumbs.db
+
+# ====== ДАННЫЕ ПРОГРАММЫ (не отслеживать) ======
+clients/
+orders/
+sklad.json
+
+# ====== ПРОЧЕЕ ======
+*.old
+*.backup
+
+# ====== СИСТЕМНЫЕ ПАПКИ ======
+work/
