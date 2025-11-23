@@ -1,13 +1,12 @@
 import time
-import json
-import os
 from datetime import date
-from utils import load_json, save_json, SKLAD_FILE, CLIENTS_DIR, ORDERS_DIR, validate_id
+from utils import logging, load_json, save_json, SKLAD_FILE, CLIENTS_DIR, ORDERS_DIR, validate_id
 
 # ---------- Список функций (Заказы) -------------
 
+def create_order(order_id, client_id, items): 
+    """Функция создания заказа"""     
 
-def create_order(order_id, client_id, items):        # ----------- Создание заказа
     # Безопасная проверка ID
     if not validate_id(order_id, "ID заказа"):
         return
@@ -18,22 +17,29 @@ def create_order(order_id, client_id, items):        # ----------- Создан�
     if not client_file.exists():
         time.sleep(0.5)
         print("❌ Клиент не найден.")
+        logging.error("Ошибка создания заказа (клиент не найден).")
         return
         
     client = load_json(client_file)
-    total = 0
-    order_items = []
-
+    
+    # Сначала проверяем ВСЕ товары перед изменением склада
     for pid, qty in items.items():
         if pid not in sklad:
             time.sleep(0.5)
             print(f"❌ Товар с ID {pid} отсутствует на складе.")
+            logging.warning("Ошибка добавления товара (товара нет на складе).")
             return
         if sklad[pid]["quantity"] < qty:
             time.sleep(0.5)
             print(f"❌ Недостаточно товара {sklad[pid]["name"]} (на складе {sklad[pid]["quantity"]}).")
+            logging.warning("Ошибка добавления товара (недостаточное кол-во товара на складе).")
             return
-        
+    
+    # Если все проверки прошли, применяем изменения
+    total = 0
+    order_items = []
+    
+    for pid, qty in items.items():
         price = sklad[pid]["price"] * qty
         total += price
         order_items.append({
@@ -61,8 +67,11 @@ def create_order(order_id, client_id, items):        # ----------- Создан�
 
     time.sleep(0.5)
     print(f"✅ Заказ {order_id} создан. Общая сумма: {total}.")
+    logging.info(f"Заказ {order_id} создан. Общая сумма: {total}.")
 
 def show_orders():
+    """Функция выводит список активных заказов"""
+
     files = list(ORDERS_DIR.glob("*.json"))
     if not files:
         time.sleep(0.5)
@@ -74,8 +83,13 @@ def show_orders():
         order = load_json(order_file)
         if order:  # Проверяем, что файл корректно загрузился
             print(f"[{order['order_id']}] Клиент: {order['client_id']} | Сумма: {order['total']} | Статус: {order['status']} | Дата: {order['date']}")
+        else:
+            print("❌Ошибка загрузки json файла!")
+            logging.error("Ошибка загрузки json файла!")
 
-def update_order_status(order_id, new_status):       # ----------- Изменить статус заказа
+def update_order_status(order_id, new_status):    
+    """Функция изменения статуса заказа"""
+
     # Безопасная проверка ID
     if not validate_id(order_id, "ID заказа"):
         return
@@ -85,6 +99,7 @@ def update_order_status(order_id, new_status):       # ----------- Измени�
     if not order_file.exists():
         time.sleep(0.5)
         print("❌ Заказ не найден.")
+        logging.error("Ошибка изменения статуса заказа (заказ не найден).")
         return
     
     order = load_json(order_file)
@@ -93,12 +108,15 @@ def update_order_status(order_id, new_status):       # ----------- Измени�
     save_json(order_file, order)
     time.sleep(0.5)
     print(f"🔄 Статус заказа {order_id} изменён на: {new_status}.")
-
+    logging.info(f"Статус заказа {order_id} изменён на: {new_status}.")
 
 # ------------ Меню (заказы) ------------
 
-def order_menu():                                    # ----------- Меню заказов
+def order_menu():    
+    """Функция меню для работы с заказами"""
+
     while True:
+    
         print("\n---------Меню заказов---------")
         print("1.➕ Создать заказ")
         print("2.📋 Список заказов")

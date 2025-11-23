@@ -1,9 +1,11 @@
 import time
-from utils import load_json, save_json, SKLAD_FILE
+from utils import logging, load_json, save_json, SKLAD_FILE
 
 # ---------- Список функций (Работа со складом) ----------------
 
-def add_product(product_id, name, category, price, quantity):      # --------- Добавление товара на склад
+def add_product(product_id, name, category, price, quantity):  
+    """Функция добавления товара на склад"""
+
     sklad = load_json(SKLAD_FILE)
     sklad[product_id] = {
         "name": name,
@@ -14,19 +16,26 @@ def add_product(product_id, name, category, price, quantity):      # --------- �
     save_json(SKLAD_FILE, sklad)
     time.sleep(0.5)
     print(f"Товар {name} добавлен на склад.")
+    logging.info(f"Товар {name} добавлен на склад.")
 
-def remove_product(product_id):                      # ------------ Удаление товара из склада
+def remove_product(product_id):  
+    """Функция удаление товара из склада"""
+                        
     sklad = load_json(SKLAD_FILE)
     if product_id in sklad:
         deleted = sklad.pop(product_id)
         save_json(SKLAD_FILE, sklad)
         time.sleep(0.5)
         print(f"🗑️ Товар {deleted['name']} удалён со склада.")
+        logging.info(f"Товар {deleted['name']} удалён со склада.")
     else:
         time.sleep(0.5)
         print("❌ Товар не найден.")
+        logging.error("Ошибка удаления товара (товар не найден).")
 
-def show_sklad():                                  # ------------ Показать склад
+def show_sklad():     
+    """Функция выводит список товаров на складе"""
+
     sklad = load_json(SKLAD_FILE)
     if not sklad:
         print("📦 Склад пуст.")
@@ -36,32 +45,42 @@ def show_sklad():                                  # ------------ Показат
     for pid, info in sklad.items():
         print(f"[{pid}] {info['name']} | Категория: {info['category']} | Цена: {info['price']} | Кол-во: {info['quantity']}")
 
-def update_quantity(product_id, new_quantity):    # ------------ Изменить кол-во товара
+def update_quantity(product_id, new_quantity):  
+    """Функция изменения кол-ва товара на складе"""
+
     sklad = load_json(SKLAD_FILE)
     if product_id in sklad:
         sklad[product_id]["quantity"] = new_quantity
         save_json(SKLAD_FILE, sklad)
         time.sleep(0.5)
         print(f"🔄 Количество товара {sklad[product_id]['name']} обновлено: {new_quantity}.")
+        logging.info(f"Количество товара на складе {sklad[product_id]['name']} обновлено: {new_quantity}.")
     else:
         time.sleep(0.5)
         print("❌ Товар не найден.")
+        logging.error("Ошибка изменения кол-ва товара на складе (товар не найден).")
 
-def update_price(product_id, new_price):          # ------------- Изменить цену товара
+def update_price(product_id, new_price): 
+    """Функция изменения цены товара на складе"""
+
     sklad = load_json(SKLAD_FILE)
     if product_id in sklad:
         sklad[product_id]["price"] = new_price
         save_json(SKLAD_FILE, sklad)
         time.sleep(0.5)
         print(f"🔄 Цена на товар {sklad[product_id]['name']} обновлена: {new_price}")
+        logging.info(f"Цена на товар {sklad[product_id]['name']} обновлена: {new_price}")
     else:
         time.sleep(0.5)
         print("❌ Товар не найден.")
+        logging.error("Ошибка изенения цены товара (товар не найден).")
 
 
 # -------------- Меню --------------------
 
-def sklad_menu():                   # ------------- Меню склада
+def sklad_menu():  
+    """Функция меню для работы со складом"""
+
     while True:
         print("\n---------Склад---------")
         print("1.➕ Добавить товар")

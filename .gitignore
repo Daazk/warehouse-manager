@@ -1,7 +1,7 @@
 # Данные приложения (не коммитим реальные данные)
-sklad.json
-clients/
-orders/
+data/sklad.json
+data/clients/
+data/orders/
 *.tmp
 
 # Python

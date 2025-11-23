@@ -1,12 +1,11 @@
 import time
-import json
-import os
-from utils import load_json, save_json, SKLAD_FILE, CLIENTS_DIR, validate_id
+from utils import logging, load_json, save_json, SKLAD_FILE, CLIENTS_DIR, validate_id
 
 # ---------- Список функций (Работа с клиентом) ------------
 
+def add_client(client_id, name, phone, email):  
+    """Функция добавления клиента"""  
 
-def add_client(client_id, name, phone, email):    # ------------- Добавить клиента
     # Безопасная проверка ID
     if not validate_id(client_id, "ID клиента"):
         return
@@ -14,6 +13,7 @@ def add_client(client_id, name, phone, email):    # ------------- Добавит
     client_file = CLIENTS_DIR / f"{client_id}.json"
     if client_file.exists():
         print("❌ Клиент с таким ID существует.")
+        logging.warning("Попытка добавления существуещего клиента.")
         return
     
     client = {
@@ -26,8 +26,11 @@ def add_client(client_id, name, phone, email):    # ------------- Добавит
 
     save_json(client_file, client)
     print(f"✅ Клиент {name} добавлен.")
+    logging.info(f"Новый клиент добавлен, ID - {client_id}.")
 
-def show_clients():                               # ------------- Список клиентов
+def show_clients():    
+    """Функция показывает список клиентов"""    
+
     files = list(CLIENTS_DIR.glob("*.json"))
     if not files:
         print("📋 Список клиентов пуст.")
@@ -37,8 +40,13 @@ def show_clients():                               # ------------- Список �
         client = load_json(client_file)
         if client:  # Проверяем, что файл корректно загрузился
             print(f"[{client['ID']}] {client['name']} | Телефон: {client['phone']} | Заказов: {len(client['orders'])}")
+        else:
+            print("❌Ошибка загрузки json файла!")
+            logging.error("Ошибка загрузки json файла!")
 
-def remove_client(client_id):                     # ------------- Удаление клиента
+def remove_client(client_id):       
+    """Функция удаления клиентов"""  
+
     # Безопасная проверка ID
     if not validate_id(client_id, "ID клиента"):
         return
@@ -47,12 +55,16 @@ def remove_client(client_id):                     # ------------- Удалени
     if client_file.exists():
         client_file.unlink()
         print(f"🗑️ Клиент {client_id} удалён.")
+        logging.info(f"Клиент {client_id} удалён")
     else:
         print("❌ Клиент не найден.")
+        logging.warning("Попытка удаления несуществующего клиента")
 
 # ------------ Меню (клиенты) --------------
 
-def client_menu():                  # ------------- Меню клиентов
+def client_menu():   
+    """Меню для роботы с клиентами"""  
+                 
     while True:
         print("\n---------Клиенты---------")
         print("1.✅Добавить клиента")
